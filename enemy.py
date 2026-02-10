@@ -38,9 +38,8 @@ class Enemy(pg.sprite.Sprite):
 
     def rotate(self):
         dist = self.target - self.pos
-
         self.angle = math.degrees(math.atan2(-dist[1], dist[0]))
-
         self.image = pg.transform.rotate(self.orginal_image, self.angle)
         self.rect = self.image.get_rect()
         self.rect.center = self.pos
+    
