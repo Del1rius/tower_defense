@@ -8,7 +8,7 @@ class World():
 
     def process_data(self):
         for layer in self.level_data["layers"]:
-            if layer["name"] == "waypoint":
+            if layer["name"] == "waypoints":
                 for obj in layer["objects"]:
                     waypoint_data = obj["polyline"]
                     self.process_waypoints(waypoint_data)
