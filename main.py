@@ -21,13 +21,25 @@ enemy_image = pg.image.load('assets/images/enemies/enemy_1.png').convert_alpha()
 
 #load json data for level
 with open('levels/level.tmj') as file:
+    
     world_data = json.load(file)
 
 def create_turret(mouse_pos):
     mouse_tile_x = mouse_pos[0] // c.TILE_SIZE
     mouse_tile_y = mouse_pos[1] // c.TILE_SIZE
-    turret = Turret(cursor_turret, mouse_tile_x, mouse_tile_y)
-    turret_group.add(turret)
+    #calculate the sequential number of tile
+    mouse_tile_num = (mouse_tile_y * c.COLS) + mouse_tile_x
+    #check if that tile is grass
+    if world.tile_map[mouse_tile_num] == 7:
+        #check to see if there isnt a turret already there
+        space_is_free = True
+        for turret in turret_group:
+            if (mouse_tile_x, mouse_tile_y) == (turret.tile_x, turret.tile_y):
+                space_is_free = False
+        #if it is free space then you can create a turret
+        if space_is_free == True:
+            turret = Turret(cursor_turret, mouse_tile_x, mouse_tile_y)
+            turret_group.add(turret)
 
 #create world
 world = World(world_data, map_image)
