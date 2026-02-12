@@ -4,13 +4,17 @@ import json
 from world import World
 from enemy import Enemy
 from turrets import Turret
+from button import Button
 
 pg.init()
 
 clock = pg.time.Clock()
 #create game window
-screen = pg.display.set_mode((c.SCREEN_WIDTH, c.SCREEN_HEIGHT))
+screen = pg.display.set_mode((c.SCREEN_WIDTH + c.SIDE_PANEL, c.SCREEN_HEIGHT))
 pg.display.set_caption("Tower Defence")
+
+#game variables
+placing_turrets = False
 
 #map images
 map_image = pg.image.load('levels/level.png').convert_alpha()
@@ -18,6 +22,9 @@ map_image = pg.image.load('levels/level.png').convert_alpha()
 cursor_turret = pg.image.load('assets/images/turrets/cursor_turret.png').convert_alpha()
 #enemy images
 enemy_image = pg.image.load('assets/images/enemies/enemy_1.png').convert_alpha()
+#buttons
+buy_turret_image = pg.image.load('assets/images/buttons/buy_turret.png').convert_alpha()
+cancel_image = pg.image.load('assets/images/buttons/cancel.png').convert_alpha()
 
 #load json data for level
 with open('levels/level.tmj') as file:
@@ -38,8 +45,8 @@ def create_turret(mouse_pos):
                 space_is_free = False
         #if it is free space then you can create a turret
         if space_is_free == True:
-            turret = Turret(cursor_turret, mouse_tile_x, mouse_tile_y)
-            turret_group.add(turret)
+            new_turret = Turret(cursor_turret, mouse_tile_x, mouse_tile_y)
+            turret_group.add(new_turret)
 
 #create world
 world = World(world_data, map_image)
@@ -60,11 +67,27 @@ waypoints = [
 enemy = Enemy(world.waypoints, enemy_image)
 enemy_group.add(enemy)
 
+#create buttons
+turret_button = Button(c.SCREEN_WIDTH + 30, 120, buy_turret_image, True)
+cancel_button = Button(c.SCREEN_WIDTH + 50, 180, cancel_image, False)
+
 run = True
 while run:
 
     clock.tick(c.FPS)
+    ####################
+    #Updating Section
+    ####################
 
+    #update groups
+    enemy_group.update()
+
+
+    ####################
+    #Drawing Section
+    ####################
+
+    #Draw level
     screen.fill("purple")
 
     world.draw(screen)
@@ -72,11 +95,18 @@ while run:
     #draw enemey path
     pg.draw.lines(screen, "black", False, world.waypoints)
 
-    enemy_group.update()
-
     #draw groups
     enemy_group.draw(screen)
     turret_group.draw(screen)
+
+    #draw buttons
+    #button for placing turrets
+    if turret_button.draw(screen):
+        placing_turrets = True
+    #if placing turrets then show the cancel button as well
+    if placing_turrets == True:
+        if cancel_button.draw(screen):
+            placing_turrets = False
 
     #Event handler
     for event in pg.event.get():
@@ -87,7 +117,8 @@ while run:
             mouse_pos = pg.mouse.get_pos()
             #check to see if mouse is on game area
             if mouse_pos[0] < c.SCREEN_WIDTH and mouse_pos[1] < c.SCREEN_HEIGHT:
-                create_turret(mouse_pos)
+                if placing_turrets == True:
+                    create_turret(mouse_pos)
 
     pg.display.flip()
 
