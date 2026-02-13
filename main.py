@@ -105,6 +105,11 @@ while run:
         placing_turrets = True
     #if placing turrets then show the cancel button as well
     if placing_turrets == True:
+        #show cursor turret
+        cursor_rect = cursor_turret.get_rect()
+        cursor_pos = pg.mouse.get_pos()
+        cursor_rect.center = cursor_pos
+        screen.blit(cursor_turret, cursor_rect)
         if cancel_button.draw(screen):
             placing_turrets = False
 
