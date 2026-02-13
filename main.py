@@ -18,6 +18,8 @@ placing_turrets = False
 
 #map images
 map_image = pg.image.load('levels/level.png').convert_alpha()
+#turrret spritesheets
+turret_sheet = pg.image.load('assets/images/turrets/turret_1.png').convert_alpha()
 #cursor as a turret
 cursor_turret = pg.image.load('assets/images/turrets/cursor_turret.png').convert_alpha()
 #enemy images
@@ -45,7 +47,7 @@ def create_turret(mouse_pos):
                 space_is_free = False
         #if it is free space then you can create a turret
         if space_is_free == True:
-            new_turret = Turret(cursor_turret, mouse_tile_x, mouse_tile_y)
+            new_turret = Turret(turret_sheet, mouse_tile_x, mouse_tile_y)
             turret_group.add(new_turret)
 
 #create world
@@ -81,7 +83,7 @@ while run:
 
     #update groups
     enemy_group.update()
-
+    turret_group.update()
 
     ####################
     #Drawing Section
@@ -109,7 +111,8 @@ while run:
         cursor_rect = cursor_turret.get_rect()
         cursor_pos = pg.mouse.get_pos()
         cursor_rect.center = cursor_pos
-        screen.blit(cursor_turret, cursor_rect)
+        if cursor_pos[0] <= c.SCREEN_WIDTH:
+            screen.blit(cursor_turret, cursor_rect)
         if cancel_button.draw(screen):
             placing_turrets = False
 
