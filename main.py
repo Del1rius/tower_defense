@@ -28,6 +28,7 @@ enemy_image = pg.image.load('assets/images/enemies/enemy_1.png').convert_alpha()
 #buttons
 buy_turret_image = pg.image.load('assets/images/buttons/buy_turret.png').convert_alpha()
 cancel_image = pg.image.load('assets/images/buttons/cancel.png').convert_alpha()
+upgrade_turret_image = pg.image.load('assets/images/buttons/upgrade_turret.png').convert_alpha()
 
 #load json data for level
 with open('levels/level.tmj') as file:
