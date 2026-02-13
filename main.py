@@ -20,7 +20,10 @@ selected_turret = None
 #map images
 map_image = pg.image.load('levels/level.png').convert_alpha()
 #turrret spritesheets
-turret_sheet = pg.image.load('assets/images/turrets/turret_1.png').convert_alpha()
+turret_spritesheets = []
+for x in range(1, c.TURRET_LEVELS + 1):
+    turret_sheet = pg.image.load(f'assets/images/turrets/turret_{x}.png').convert_alpha()
+    turret_spritesheets.append(turret_sheet)
 #cursor as a turret
 cursor_turret = pg.image.load('assets/images/turrets/cursor_turret.png').convert_alpha()
 #enemy images
@@ -49,7 +52,7 @@ def create_turret(mouse_pos):
                 return turret
         #if it is free space then you can create a turret
         if space_is_free == True:
-            new_turret = Turret(turret_sheet, mouse_tile_x, mouse_tile_y)
+            new_turret = Turret(turret_spritesheets, mouse_tile_x, mouse_tile_y)
             turret_group.add(new_turret)
 
 #selecting turret
@@ -86,7 +89,8 @@ enemy_group.add(enemy)
 
 #create buttons
 turret_button = Button(c.SCREEN_WIDTH + 30, 120, buy_turret_image, True)
-cancel_button = Button(c.SCREEN_WIDTH + 50, 180, cancel_image, False)
+cancel_button = Button(c.SCREEN_WIDTH + 50, 180, cancel_image, True)
+upgrade_button = Button(c.SCREEN_WIDTH + 5, 180, upgrade_turret_image, True)
 
 run = True
 while run:
@@ -135,6 +139,12 @@ while run:
             screen.blit(cursor_turret, cursor_rect)
         if cancel_button.draw(screen):
             placing_turrets = False
+    #if a turret is selected then show the upgrade button
+    if selected_turret:
+        #if a turret can be upgraded then show the upgrade button
+        if selected_turret.upgrade_level < c.TURRET_LEVELS:
+            if upgrade_button.draw(screen):
+                selected_turret.upgrade()
 
     #Event handler
     for event in pg.event.get():

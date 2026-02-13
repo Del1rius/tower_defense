@@ -4,7 +4,7 @@ import math
 from turret_data import TURRET_DATA
 
 class Turret(pg.sprite.Sprite):
-    def __init__(self, sprite_sheet, tile_x, tile_y):
+    def __init__(self, sprite_sheets, tile_x, tile_y):
         pg.sprite.Sprite.__init__(self)
         self.upgrade_level = 1
         self.range = TURRET_DATA[self.upgrade_level - 1].get("range")
@@ -21,8 +21,8 @@ class Turret(pg.sprite.Sprite):
         self.y = (self.tile_y + 0.5) * c.TILE_SIZE
 
         #animation variables
-        self.sprite_sheet = sprite_sheet 
-        self.animation_list = self.load_images()
+        self.sprite_sheets = sprite_sheets
+        self.animation_list = self.load_images(self.sprite_sheets[self.upgrade_level - 1])
         self.frame_index = 0
         self.update_time = pg.time.get_ticks()
 
@@ -42,12 +42,12 @@ class Turret(pg.sprite.Sprite):
         self.range_rect = self.range_image.get_rect()
         self.range_rect.center = self.rect.center
 
-    def load_images(self):
+    def load_images(self, sprite_sheet):
         #extract images from spritesheet
-        size = self.sprite_sheet.get_height()
+        size = sprite_sheet.get_height()
         animation_list = []
         for x in range(c.ANIMATION_STEPS):
-            temp_img = self.sprite_sheet.subsurface(x * size, 0, size, size)
+            temp_img = sprite_sheet.subsurface(x * size, 0, size, size)
             animation_list.append(temp_img)
         return animation_list 
     
@@ -91,7 +91,9 @@ class Turret(pg.sprite.Sprite):
         self.upgrade_level += 1
         self.range = TURRET_DATA[self.upgrade_level - 1].get("range")
         self.cooldown = TURRET_DATA[self.upgrade_level -1].get("cooldown")
-
+        #upgrade turret image
+        self.animation_list = self.load_images(self.sprite_sheets[self.upgrade_level - 1])
+        self.orignal_image = self.animation_list[self.frame_index]
         #upgrade range circle
         self.range_image = pg.Surface((self.range * 2, self.range * 2))
         self.range_image.fill((0, 0 ,0))
