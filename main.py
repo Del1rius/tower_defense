@@ -27,7 +27,13 @@ for x in range(1, c.TURRET_LEVELS + 1):
 #cursor as a turret
 cursor_turret = pg.image.load('assets/images/turrets/cursor_turret.png').convert_alpha()
 #enemy images
-enemy_image = pg.image.load('assets/images/enemies/enemy_1.png').convert_alpha()
+enemy_images = {
+    "weak": pg.image.load('assets/images/enemies/enemy_1.png').convert_alpha(),
+    "medium": pg.image.load('assets/images/enemies/enemy_2.png').convert_alpha(),
+    "strong": pg.image.load('assets/images/enemies/enemy_3.png').convert_alpha(),
+    "elite": pg.image.load('assets/images/enemies/enemy_4.png').convert_alpha()
+}
+
 #buttons
 buy_turret_image = pg.image.load('assets/images/buttons/buy_turret.png').convert_alpha()
 cancel_image = pg.image.load('assets/images/buttons/cancel.png').convert_alpha()
@@ -76,15 +82,8 @@ world.process_data()
 enemy_group = pg.sprite.Group()
 turret_group = pg.sprite.Group()
 
-waypoints = [
-    (100, 100),
-    (400, 200),
-    (400, 100),
-    (200, 300)
-]
-
-
-enemy = Enemy(world.waypoints, enemy_image)
+enemy_type = "weak"
+enemy = Enemy(enemy_type, world.waypoints, enemy_images)
 enemy_group.add(enemy)
 
 #create buttons
@@ -118,7 +117,7 @@ while run:
     world.draw(screen)
 
     #draw enemey path
-    pg.draw.lines(screen, "black", False, world.waypoints)
+    #pg.draw.lines(screen, "black", False, world.waypoints)
 
     #draw groups
     enemy_group.draw(screen)

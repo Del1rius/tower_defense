@@ -4,14 +4,15 @@ import math
 
 
 class Enemy(pg.sprite.Sprite):
-    def __init__(self, waypoints, image):
+    def __init__(self, enemy_type, waypoints, images):
         pg.sprite.Sprite.__init__(self)
         self.waypoints = waypoints
         self.pos = Vector2(self.waypoints[0])
         self.target_waypoint = 1
+        self.health = 10
         self.speed = 2
         self.angle = 0
-        self.orginal_image = image
+        self.orginal_image = images.get(enemy_type)
         self.image = pg.transform.rotate(self.orginal_image, self.angle)
         self.rect = self.image.get_rect()
         self.rect.center = self.pos
