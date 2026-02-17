@@ -139,6 +139,7 @@ while run:
 
     draw_text(str(world.health), text_font, "grey100", 0, 0)
     draw_text(str(world.money), text_font, "grey100", 0, 30)
+    draw_text(str(world.level), text_font, "grey100", 0, 60)
 
     #check if level has started or not
     if level_started == False:
@@ -156,7 +157,11 @@ while run:
 
     #check if the wave is finished
     if world.check_level_complete() == True:
+        world.level += 1
         level_started = False
+        last_enemy_spawn = pg.time.get_ticks()
+        world.reset_level()
+        world.process_enemies()
 
     #draw buttons
     #button for placing turrets
