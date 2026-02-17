@@ -14,6 +14,7 @@ screen = pg.display.set_mode((c.SCREEN_WIDTH + c.SIDE_PANEL, c.SCREEN_HEIGHT))
 pg.display.set_caption("Tower Defence")
 
 #game variables
+level_started = False
 last_enemy_spawn = pg.time.get_ticks()
 placing_turrets = False
 selected_turret = None
@@ -39,10 +40,20 @@ enemy_images = {
 buy_turret_image = pg.image.load('assets/images/buttons/buy_turret.png').convert_alpha()
 cancel_image = pg.image.load('assets/images/buttons/cancel.png').convert_alpha()
 upgrade_turret_image = pg.image.load('assets/images/buttons/upgrade_turret.png').convert_alpha()
+begin_image = pg.image.load('assets/images/buttons/begin.png').convert_alpha()
 
 #load json data for level
 with open('levels/level.tmj') as file:
     world_data = json.load(file)
+
+#load fonts for displaying text on the screen
+text_font = pg.font.SysFont("Consolas", 24, bold = True)
+large_font = pg.font.SysFont("Consolas", 36)
+
+#functon for outputting text onto the screen
+def draw_text(text, font, text_col, x, y):
+    img = font.render(text, True, text_col)
+    screen.blit(img, (x, y))
 
 #creating turret
 def create_turret(mouse_pos):
@@ -61,6 +72,9 @@ def create_turret(mouse_pos):
         if space_is_free == True:
             new_turret = Turret(turret_spritesheets, mouse_tile_x, mouse_tile_y)
             turret_group.add(new_turret)
+            world.money -= c.BUY_COST
+
+
 
 #selecting turret
 def select_turret(mouse_pos):
@@ -88,6 +102,7 @@ turret_group = pg.sprite.Group()
 turret_button = Button(c.SCREEN_WIDTH + 30, 120, buy_turret_image, True)
 cancel_button = Button(c.SCREEN_WIDTH + 50, 180, cancel_image, True)
 upgrade_button = Button(c.SCREEN_WIDTH + 5, 180, upgrade_turret_image, True)
+begin_button = Button(c.SCREEN_WIDTH + 60, 300, begin_image, True)
 
 run = True
 while run:
@@ -98,7 +113,7 @@ while run:
     ####################
 
     #update groups
-    enemy_group.update()
+    enemy_group.update(world)
     turret_group.update(enemy_group)
 
     #highlight selected turret
@@ -122,14 +137,26 @@ while run:
     for turret in turret_group:
         turret.draw(screen)
 
-    #spawn enemies
-    if pg.time.get_ticks() - last_enemy_spawn > c.SPAWN_COOLDOWN:
-        if world.spawned_enemies < len(world.enemy_list):
-            enemy_type = world.enemy_list[world.spawned_enemies]
-            enemy = Enemy(enemy_type, world.waypoints, enemy_images)
-            enemy_group.add(enemy)
-            world.spawned_enemies += 1
-            last_enemy_spawn = pg.time.get_ticks()
+    draw_text(str(world.health), text_font, "grey100", 0, 0)
+    draw_text(str(world.money), text_font, "grey100", 0, 30)
+
+    #check if level has started or not
+    if level_started == False:
+        if begin_button.draw(screen):
+            level_started = True
+    else:
+        #spawn enemies
+        if pg.time.get_ticks() - last_enemy_spawn > c.SPAWN_COOLDOWN:
+            if world.spawned_enemies < len(world.enemy_list):
+                enemy_type = world.enemy_list[world.spawned_enemies]
+                enemy = Enemy(enemy_type, world.waypoints, enemy_images)
+                enemy_group.add(enemy)
+                world.spawned_enemies += 1
+                last_enemy_spawn = pg.time.get_ticks()
+
+    #check if the wave is finished
+    if world.check_level_complete() == True:
+        level_started = False
 
     #draw buttons
     #button for placing turrets
@@ -150,7 +177,9 @@ while run:
         #if a turret can be upgraded then show the upgrade button
         if selected_turret.upgrade_level < c.TURRET_LEVELS:
             if upgrade_button.draw(screen):
-                selected_turret.upgrade()
+                if world.money >= c.UPGRADE_COST:
+                    selected_turret.upgrade()
+                    world.money -= c.UPGRADE_COST
 
     #Event handler
     for event in pg.event.get():
@@ -165,7 +194,9 @@ while run:
                 selected_turret = None
                 clear_selection()
                 if placing_turrets == True:
-                    create_turret(mouse_pos)
+                    #check if there is enough money for a turret
+                    if world.money >= c.BUY_COST:
+                        create_turret(mouse_pos)
                 else:
                     selected_turret = select_turret(mouse_pos)
 
