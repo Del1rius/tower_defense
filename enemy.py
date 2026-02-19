@@ -32,11 +32,12 @@ class Enemy(pg.sprite.Sprite):
             self.kill()
             world.health -= 1
             world.missed_enemies +=  1
-
+        
+        #calculate distance to target
         dist = self.movement.length()
-
-        if dist >= self.speed:
-            self.pos += self.movement.normalize() * self.speed
+        #check if remain distance is greater than the enemy speed
+        if dist >= (self.speed * world.game_speed):
+            self.pos += self.movement.normalize() * (self.speed * world.game_speed)
         else:
             if dist != 0:
                 self.pos += self.movement.normalize() * dist
